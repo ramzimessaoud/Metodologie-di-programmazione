@@ -1,0 +1,115 @@
+1.
+chiamata A cand {2, 3} util {2, 3} migliore 2
+chiamata B cand {2, 3} util {2, 3} migliore 2
+chiamata C cand {2, 3} util {3} migliore 3
+chiamata D cand {2, 3} util {3} migliore 3
+chiamata E cand {1} util {1} migliore 1
+chiamata F cand {5, 8} util {8} migliore 8
+chiamata G cand {8} util {} migliore
+chiamata H cand {7} util {7} migliore 7
+
+2.
+struct Matrix {
+// ...
+size_type num_rows();
+size_type num_cols();
+value_type& get(const size_type& row, const size_type& col);
+Matrix& operator-();
+Matrix& operator+=(const Matrix& y);
+Matrix operator+(const Matrix& y);
+void print(ostream& os);
+// ...
+};
+
+3.
+Problema con costruttore se dovesse fallire l'allocazione di pd, si avrebbe
+memory leak di pi 
+Soluzione:
+public:
+A(const std::string& s) : pi(new int), str(s) {
+try{
+	pd = new double();
+	}
+catch(...){
+	delete pi;
+	}
+			
+ }
+
+Un altro problema è che viola la regola dei 6, dovrebbe definire o disattivati
+o privati e non implementati, anche il costruttore di copia/spostamento e
+l'operatore di assegnamento per copia/spostamento
+
+4.
+
+template <class InputIterator, class OutputIterator>
+  OutputIterator unique_copy (InputIterator first, InputIterator last,
+                              OutputIterator result)
+{
+  if (first==last) return result;
+
+  *result = *first;
+  while (++first != last) {
+    typename iterator_traits<InputIterator>::value_type val = *first;
+    if (!(*result == val))   // or: if (!pred(*result,val)) for version (2)
+      *(++result)=val;
+  }
+  return ++result;
+}
+
+5.
+void foo (const int i, int a[], int prom){}
+
+int a[5];
+short prom = 3;
+int i = 3;
+
+foo(i, a, prom);
+
+6.
+Costruttore Cane
+bau
+=== 1 ===
+Costruttore Animale
+Costruttore Cane
+Costruttore Dobermann
+grrrrrr
+=== 2 ===
+Copia Animale
+Copia Animale
+=== 3 ===
+bau
+bau
+=== 4 ===
+Distruttore Cane
+Distruttore Animale
+Distruttore Cane
+Distruttore Animale
+=== 5 ===
+Costruttore Animale
+Verso non specificato
+Distruttore Animale
+Distruttore Dobermann
+Distruttore Cane
+Distruttore Animale
+Distruttore Cane
+Distruttore Animale
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

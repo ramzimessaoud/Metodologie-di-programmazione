@@ -1,0 +1,157 @@
+1.
+
+chiamata a cand {4} util {4} migliore 4
+chiamata b cand {7} util {} migliore 
+chiamata c cand {1, 2} util {1, 2} migliore 1
+chiamata d cand {1, 2, 5} util {1, 2, 5} migliore 5
+chiamata e cand {1, 2} util {1, 2} migliore AMB
+chiamata f cand {1, 2, 5} util {1, 2, 5} migliore 2
+chiamata g cand {3} util {} migliore /
+chiamata h cand {3, 6} util {6} migliore 6
+
+2.
+#include <string>
+#include <iostream>
+#include <list>
+#include <iterator>
+
+template <typename Iter, typename UnaryPred>
+int count_if(Iter i, Iter i_end, UnaryPred up){
+int n = 0;
+for ( ; i!=i_end; ++i)
+    if(up(*i))
+       n++;
+return n;
+}
+
+bool mag (std::string s){
+    return s.length()>10;
+}
+
+int main(){
+    std::list<std::string> ls;
+    std::istream_iterator<std::string> i(std::cin), i_end();
+    auto lsi = ls.begin();
+    for( ; *i!="fine" ; ++i){
+        ls.insert(lsi,*i);
+        lsi++;
+    }
+    lsi = ls.begin();
+    auto lse = ls.end();
+    int n = count_if(lsi, lse,
+                     mag);
+    std::cout << n << std::endl;
+}
+
+3.
+"=== 1 ===" 
+"B::f(int)"
+"B::g(int)"
+"B::f(int)" 
+"C::g(int)"
+
+"=== 2 ==="
+"A::f(double)"
+"B::f(int)" 
+"C::g(int)"
+
+"=== 3 ==="
+"B::f(int)"
+"C::g(int)"
+
+"=== 4 ===" 
+"Destructor C::~C()" 
+"Destructor B::~B()"
+"Destructor A::~A()"
+
+"Destructor B::~B()"
+"Destructor A::~A()"
+
+
+4.
+
+Mi sembra tutto corretto, le dipendenze sono verso l'alto e non verso il 
+basso. 
+Il software è aperto anche se si volesse utilizzare un terzo Protocollo.
+
+Se i metodi 
+
+bool DoMsg1( /*...*/ );
+bool DoMsg2( /*...*/ );
+bool DoMsg3( /*...*/ );
+
+di Protocol1 sono uguali a quelli di Protocol2, si potrebbe far ereditare
+quest'ultima da Protocol1 anziché da BasicProtocol.
+
+
+
+
+5.
+
+A(const std::string& s) : pi(new int), str(s), pd(new double) { }
+se pi(new int) dovesse andare a buon fine ma pd(new double) no, si avrebbe 
+memory leak di pi
+Soluzione:
+A(const std::string& s) : pi(new int), str(s) {
+ try{
+	pd(new double);
+ }catch(...)
+ {delete pi;}
+ }
+
+Inoltre siccome la calsse ha ridefinito costruttore e distruttore
+dovrebbe ridefinire anche operatore di asseggnamento o costruttore di 
+copia o quantomeno dichiararli privati e non implementati o disattivarli
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

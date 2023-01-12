@@ -1,0 +1,260 @@
+1.
+
+chiamata A cand {1, 2} util {1} migliore 1
+chiamata B cand {10} util {10} migliore 10
+chiamata C cand {5, 6, 10} util {6} migliore 6
+chiamata D cand {5, 6} util {5} migliore 5
+chiamata E cand {} util {} migliore 
+chiamata F cand {7, 8} util {7, 8} migliore 8
+chiamata G cand {7, 8} util {7, 8} migliore 7
+chiamata H cand {9, 11, 12} util {9, 12} migliore 9
+chiamata I cand {11, 12} util {11} migliore 11
+chiamata J cand {} util {} migliore 
+
+
+2.
+"=== 1 ===" 
+"B::f(int)"
+"B::g(int)"
+"B::f(int)" 
+"C::g(int)"
+
+"=== 2 ==="
+"A::f(double)"
+"B::f(int)" 
+"C::g(int)"
+
+"=== 3 ==="
+"B::f(int)"
+"C::g(int)"
+
+"=== 4 ===" 
+"Destructor C::~C()" 
+"Destructor B::~B()"
+"Destructor A::~A()"
+
+"Destructor B::~B()"
+"Destructor A::~A()"
+
+3. 
+Viola il principio OCP (Open Close Principle), tale per cui il codice
+dovrebbe essere aperto alle estensioni, ma chiuso alle modifiche, di modo 
+che si possano fare aggiunte al codice senza dover necessariamente 
+modificare quello scritto in precedenza.
+
+Dovremmo usare delle interfacce con una classe astratta chiamata
+operatore che offre un'operazione, poi le varie classi concrete 
+andranno a fare l'override di questa operazione eseguendo il proprio 
+codice. Mentre per VAR e CONST andremo a creare un'interfaccia operando.
+Utilizzando questo stratagemma, qualora volessimo aggiungere altri 
+operatori, basterà farli ereditare della classe astratta e far sì che 
+implementino i suoi metodi.
+
+
+class Var : public expr{
+ void print(name()) const;
+ double eval(const Var_Bindings& vb) const{
+   return vb[name()];
+ }
+}     
+
+class Const : public expr{
+ void print(value()) const;
+ double eval(const Var_Bindings& vb) const{
+   return value();
+ }
+}    
+ 
+class Add : public expr{
+ void print (arg1,arg2) const{
+  arg1().print();
+  print(" + ");
+  arg2().print();
+ }
+ double eval(const Var_Bindings& vb) const{
+    return arg1().eval(vb) + arg2().eval(vb);
+}
+  
+}     
+class Sub : public expr{
+void print (arg1,arg2) const{
+ arg1().print();
+ print(" - ");
+ arg2().print();
+
+double eval(const Var_Bindings& vb) const{
+   return arg1().eval(vb) - arg2().eval(vb);
+}
+}
+class Expr {
+ public:
+  Kind kind;
+  // ...
+  virtual void print() const=0;
+ 
+  virtual double eval(const Var_Bindings& vb) const=0;
+}; //expr
+
+
+4.
+a.
+iter i = std::find(v.begin(), v.end(), "inizio");
+iter i_end = std::find(v.begin(), v.end(), "fine");
+
+è errato perché il tipo di ritorno di find non è un iterator ma un 
+const_iterator,in ogni caso sarebbe più appropriato usare auto al posto 
+del tipo specifico.
+
+b.
+while (i != i_end) 
+crea dei problemi nei seguenti casi
+- non ci sono né "inizio" né "fine", in tal caso il range è valido ma
+vuoto
+- c'è solo "fine", ma non "inizio" -> UB
+- ci sono entrambi ma "fine" viene prima di "inizio" -> UB
+
+Se quello che vogliamo è scorrere il vettore, quello che è corretto fare
+è
+auto inizio = v.begin();
+auto fine = v.end();
+for ( ; inizio!=fine; ++inizio){
+	std::cout << *inizio << std::endl;
+}
+
+c.
+v.insert(++i, "prima");
+v.insert(++i, "dopo");
+il vettore potrebbe essere vuoto, in tal caso i==i_end e si avrebbe UB
+Il primo inserimento potrebbe invalidare i, quindi sarebbe più corretto
+fare
+if(i!=i_end && ++i!=i_end)
+	v.insert(i,"prima");
+if(++i!=i_end)
+	v.insert(i,"dopo");
+	
+5.
+#include <iostream>
+#include <list>
+#include <iterator>
+
+template <typename Iter1, typename Iter2, typename Iter3, typename FunBin>
+void transform( Iter1 i1, Iter1 f1,
+		Iter2 i2, Iter2 f2,
+		Iter3 i3, FunBin fb
+		){
+for( ; i1!=f1; ++i1, ++i2){
+	auto das = fb(*i1, *i2);
+	//std::cout<< das << std::endl;
+	*i3 = das;
+	++i3;
+	}
+
+}
+
+int main(){
+    std::list<int> l1 = {1, 2, 3, 4, 5, 6};
+    std::list<int> l2 = {7, 8, 9, 10, 11, 13};
+    std::list<double> media = {0, 0, 0, 0, 0, 0};
+
+    auto i1 = l1.begin();
+    auto f1 = l1.end();
+    auto i2 = l2.begin();
+    auto f2 = l2.end();
+
+    auto i3 = media.begin();
+
+    transform(  i1,  f1,
+		 i2,  f2,
+		 i3, [](double a, double b){
+              return (a+b)/2;
+              }
+		);
+    auto mi = media.begin();
+    auto me = media.end();
+
+    for( ; mi!=me; ++mi)
+        std::cout << *mi << std::endl;
+}
+
+6.
+pc è allocata dinamicamente con tipo statico puntatore a C e tipo 
+dinamico D. 
+se ci fosse un problema all'interno della funzione job, si avrebbe 
+memory leak in quanto l'eccezione non catturata farebbe saltare 
+l'esecuzione della delete pc. 
+
+Soluzione senza RAII, ma con idioma try-catch:
+
+void foo() {
+C* pc = new D();
+
+try{
+job(pc, new C());
+}catch(...){
+	delete pc;
+	throw;
+}
+
+delete pc;
+}
+
+Con idioma RAII:
+struct C { ~C() {} /* ... */ };
+struct D : public C { /* ... */ };
+void job(const C* pc1, const C* pc2);
+
+
+struct Gestore1{
+private:
+	C* risorsa = new D();
+public:
+	Gestore1();
+	~Gestore1(){delete risorsa;}
+
+	C* get(){return risorsa;}
+
+};
+
+struct Gestore2{
+private:
+ 	C* risorsa = new C();
+
+public:
+	Gestore2();
+	~Gestore2(){delete risorsa;}
+
+	C* get(){return risorsa;}
+};
+
+void foo(){
+	Gestore1 g1;
+
+	job(g1.get(), Gestore2().get());
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

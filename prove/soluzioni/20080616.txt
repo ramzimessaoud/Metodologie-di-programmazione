@@ -1,0 +1,95 @@
+1.
+chiamata 1 cand {1, 2} util {} migliore privata 
+chiamata 2 cand {1, 2} util {} migliore privata
+chiamata 3 cand {3, 4} util {3, 4} migliore 3
+chiamata 4 cand {3, 4} util {3, 4} migliore 3
+chiamata 5 cand {1, 2} util {2} migliore 2
+chiamata 6 cand {1, 2} util {} migliore NESSUNA
+chiamata 7 cand {3, 4} util {4} migliore 4
+chiamata 8 cand {3, 4} util {4} migliore NESSUNA
+chiamata 9 cand {5} util {5} migliore   5
+chiamata 10 cand {10, 11} util {10} migliore 10
+chiamata 11 cand {10, 11} util {} migliore 11
+chiamata 12 cand {9} util {} migliore NESSUNA
+
+2.
+"Costruttore Animale"
+"Verso non specificato"
+
+"Costruttore Animale"
+"Costruttore Cane"
+"bau!" 
+
+"=== 1 ==="
+"Costruttore Animale"
+"Costruttore Pesce"
+"Costruttore Pescecane"
+"(glubau!)"
+
+"=== 2 ==="
+"Copia Animale"
+"Copia Animale"
+
+"=== 3 ==="
+ "Verso non specificato"
+ "(glubau!)"
+
+"=== 4 ==="
+"Distruttore Pesce"
+"Distruttore Animale" 
+"Distruttore Cane"
+"Distruttore Animale" 
+
+"=== 5 ==="
+"Distruttore Pescecane"
+"Distruttore Pesce"
+"Distruttore Animale" 
+"Distruttore Cane"
+"Distruttore Animale"
+ 
+"Distruttore Animale" 
+
+
+
+3. Definisco Animale come classe astratta in senso tecnico, ovvero con tutti
+metodi virtuali posti = 0, di modo che non sia possibile instanziare nulla 
+direttamente attraverso la classe Animale.
+
+4. 
+
+template <typename Iter, typename BinPred>
+Iter max_element(Iter i, Iter e, Binpred bp){
+auto max = i;
+for( ; i!= e; ++i){
+	if(bp(max,i))
+	max=*i;
+}
+return max;
+} 
+
+No input iterator no output iterator
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

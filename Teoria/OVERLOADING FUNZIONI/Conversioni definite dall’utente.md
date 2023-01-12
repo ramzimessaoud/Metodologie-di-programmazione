@@ -1,0 +1,2 @@
+- Gli operator.  (+,-,=, (), ecc.)
+- Da razionale ad altro razionale

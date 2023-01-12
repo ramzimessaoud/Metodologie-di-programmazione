@@ -1,0 +1,214 @@
+1.
+chiamata a: cand {4} util {4} migliore 4
+chiamata b: cand {7} util {/} migliore / è private
+chiamata c: cand {4} util {4} migliore 4
+chiamata d: cand {7} util {/} migliore /
+chiamata e: cand {1, 2} util {1, 2} migliore 1
+chiamata f: cand {1, 2, 5} util {1, 2, 5} migliore 5
+chiamata g: cand {1, 2} util {1, 2} migliore AMBIGUA
+chiamata h: cand {1, 2, 5} util {2} migliore 2
+chiamata i: cand {1, 2, 5} util {2} migliore 2
+chiamata j: cand {3} util {/} migliore / non è const
+chiamata k: cand {6} util {6} migliore 6
+
+2.
+
+"Constructor B::B()"
+"Constructor A::A()"
+"Constructor D::D()"
+
+"=== 1 ==="
+"D::f(int)"
+"A::g(double)" 
+"B::f(int)"
+"D::g(int)"
+
+"=== 2 ==="
+"D::f(int)" 
+"D::g(int)"
+"A::g(double)"
+
+"=== 3 ==="
+"A::g(double)"
+"B::f(int)"
+"D::g(int)"
+"Destructor A::A()"
+"Destructor B::~B()"
+
+"=== 4 ==="
+"Destructor D::D()"
+"Destructor A::A()"
+"Destructor B::B()"
+
+3.
+^^Il codice sopra citato viola i principi della
+ programmazione  O-O  perché l'utente continua ad usare l'interfaccia concreta, dipendendo dai dettagli
+ implementativi (DIPENDENZE ERRATE), nello switch va 
+ a chiedere alle classi di che tipo concreto sono,
+ sottointendendo che i metoti siano propri solo della classe
+ del caso dello switch. Vengono violati quasi tutti i 
+ principi visti e  anche il contratto,
+ In questo caso il programmatore non ha portato il
+ polimorfismo dinamico fino in fondo.
+
+//codice corretto
+
+struct Manual_Generator {
+ virtual void put(const std::string& s) = 0;
+ virtual void set_boldface() = 0;
+ virtual void reset_boldface() = 0;
+ virtual void hyperlink (const std::string& uri, const std::string& text) = 0;
+ virtual void page_break() = 0; 
+ virtual ~Manual_Generator () {}
+};
+
+//ora interfaccia astratta più completa-> il resto del codice può essere semplificato
+
+//--------------------------------------------------------------------------------
+
+// user_code.cc
+#include "Manual_Generator.hh"
+
+void user_code (Manual_Gnerator* mg_p) {
+    mg_p->hyperlink("http://www.unipr.it", "UNIPR");
+    
+	mg_p->page_break();
+}
+
+//--------------------------------------------------------------------
+
+//HTML_Generator.hh
+#include "Manual_Generator.hh"
+struct HTML_Generator : public Manual_Generator{
+ void put(const std::string& s) override;
+ void set_boldface() override;
+ void reset_boldface() override;
+ void hyperlink (const std::string& uri, const std::string& text) override;
+ void page_break() override {
+ 	put("<HR>"); //simulo il cambio pagina in HTML.
+ } 
+};
+
+//--------------------------------------------------------------
+
+// ASCII_Generator.hh
+#include "Manual_Generator.hh"
+struct ASCII_Generator : public Manual_Generator{
+ void put(const std::string& s);
+ void set_boldface();
+ void reset_boldface();
+ void page_break(); //aggiunge metodo supplementare
+ void hyperlink (const std::string& uri, const std::string& text) override{
+ 	put(text);
+ 	put(" (");
+ 	put(uri);
+ 	put(")");
+ }
+ 
+};
+
+4.
+template <typename Container1, typename Container2>
+
+void f(const Container1& ll,  Container2& l) {
+ auto l_i=l.begin();
+ for (auto ll_i = ll.begin(), ll_end = ll.end(); ll_i != ll_end; ++ll_i)
+  copy(ll_i->begin(),ll_i->end(),std::back_inserter(l));
+  
+}
+
+5.
+La categoria più ampia è quella formata da i RandomAccess Iterator
+Iter deve esser almeno un forward_iterator o un input_iterator
+
+#include <iostream>
+#include <list>
+#include <vector>
+#include <iterator>
+
+template <typename Iter1, typename Iter2, typename UnaryPred>
+Iter2 find_first_of(
+                    Iter1 first1, Iter1 last1,
+                    Iter2 first2, Iter2 last2,
+                    UnaryPred upr){
+for( ; first2!=last2; ++first2){
+    auto iter = first1; //Tutte le volte daccapo
+    for( ; iter!=last1; ++iter)
+        if(*first2==*iter)
+        return iter;
+}
+return last1;
+}
+
+
+6.
+A.
+Se nell'allocazione di d ci fosse un errore, si avrebbe un
+memory leak su p (cosa improbabile dato che d è un tipo 
+built in).
+Inoltre ha ridefinito costruttore e distruttore, ma non 
+costruttore per copia/spostamento e operatore di assegnamento
+per copia/spostamento.
+
+B.
+Dovrebbe andare tutto bene.
+
+C.
+Anche qui, A ha dei metodi non corretti ma qui non 
+vengono mai usati, dato che è private
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

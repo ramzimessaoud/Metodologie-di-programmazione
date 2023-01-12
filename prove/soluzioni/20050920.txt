@@ -1,0 +1,193 @@
+1.
+
+chiamata 1: cand{1, 2, 3} util {1, 2, 3} migliore 2
+chiamata 2: cand{1, 2, 3} util {2, 3} migliore 2
+chiamata 3: cand{1, 2, 3} util {1, 2, 3} migliore AMBIGUA
+chiamata 4: cand{4, 5} util {4, 5} migliore 4
+chiamata 5: cand{4, 5} util {4, 5} migliore 5
+chiamata 6: cand{4, 5} util {5} migliore 5
+chiamata 7: cand{4, 5} util {5} migliore 5
+chiamata 8: cand{6, 7} util {6} migliore 6
+chiamata 9: cand{6, 7} util {} migliore NESSUNA
+
+2.
+
+"Constructor Base::Base()"
+
+"Constructor Base::Base()"
+"Constructor Derived::Derived()" 
+
+"=== 0 ==="
+"Constructor Base::Base(const Base&)"
+
+"=== 1 ==="
+"Base::f()"
+
+"Base::f()"
+"Base::h()"
+
+"=== 2 ==="
+"Derived::f()"
+"Base::g()"
+"Derived::h()" 
+
+"=== 3 ==="
+"Derived::f()"
+
+"Base::f()"
+
+"Base::g()" 
+
+"Base::h()"
+
+"Base::h()"
+
+"=== 4 ==="
+"Destructor Base::~Base()"
+"Destructor Derived::~Derived()"
+"Destructor Base::~Base()"
+"Destructor Base::~Base()"
+
+3.
+
+"Constructor C1::C1()"
+"Constructor C3::C3()"
+"Constructor C2::C2()" //NON costruiti
+
+"Destructor C3::~C3()"
+"Destructor C1::~C1()"
+
+"..." 
+
+4. 
+//Header file Biblio.hh
+class Biblio {
+public:
+	virtual void b1() = 0;
+	virtual void b2(const Biblio& y, int n) = 0; 
+	virtual void b3(int n) = 0;
+	virtual ~Biblio() {}
+};
+
+//------------------------------------------------------
+
+//codice utente
+
+//user_code.cc
+
+#include "Biblio.hh"
+
+void f(Biblio& x, const Biblio& y, int n) {
+	//...
+	if (n>0)
+	  x.b3(n);
+	else{
+	  x.b1();
+	  n=5;
+    }
+    // ...
+    x.b2(y, n);
+    //...
+}
+
+//-------------------------------------------------------
+
+//implementazione di Biblio che usa BSoft per implementare i
+//servizi
+
+//Header file BSoft_Adapter.hh
+
+#include "Biblio.hh"
+#include "BSoft.hh"
+
+class BSoft_Adapter : public Biblio { //relaz. IS-A
+private:
+	BSoft bs; //relaz. HAS-A
+public:
+	BSoft_Adapter (const BSoft& bsoft)
+	  :bs(bsoft) {}
+	
+	void b1() override {bs.s1(); }
+	void b2(const Biblio& y, int n) override {
+		const BSoft_Adapter& y_adapter = dynamic_cast<const BSoft_Adapter&>(y); //cast dinamico su riferimento 
+//se il cast non ha successo viene lanciata eccezione bad_cast
+		bs.s2(y_adapter.bs,n); 
+	}
+	void b3(int n) override{ bs.s3(n)}
+	// ...
+}; 
+
+//adattatore deve implementare 3 metodi della classe base
+
+//---------------------------------------------------------
+
+//Header file BWare_Adapter.hh
+
+#include "Biblio.hh"
+#include "BWare.hh"
+
+
+class BWare_Adapter : public Biblio {
+private:
+	BWare bw;
+public:
+	BWare_Adapter (const BWare& bware)
+	  :bw(bware) {}
+	
+	void b1() override {bw.w1(); }
+	void b2(const Biblio& y, int n) override {
+		const auto& y_adapter = dynamic_cast<const BWare_Adapter&>(y); //cast dinamico
+		bw.w2_1(y_adapter.bw);
+		bw.w2_2(n);
+	}
+	void b3(int n) override{ bw.w3(n)}
+	// ...
+}; 
+
+5.
+Errori: 
+-Iter i = std::find(v.begin(), v.end(), "cioccolato"); (ct)
+-Iter i_end = std::find(v.begin(), v.end(), "menta");
+Falliscono perchè il tipo di ritorno della funzione non è qiello specificato
+per Iter, ritorna infatti const_iterator, non un iterator!
+Correzione: uso auto per la deduzione di tipo
+	auto i = std::find(v.begin(), v.end(), "cioccolato");
+	auto i_	end = std::find(v.begin(), v.end(), "menta");
+-Non è detto che il range del ciclo for sia valido, alcuni dei casi sono:
+  1. Nel vettore non ci sono né "cioccolato" nè "menta" e la find restituisce
+  v.end() -> vuoto ma valido
+  2. Se "cioccolato" non c'è, ma "menta" si, il range inizia con v.end() 
+  e si va in undefined behaveiour o segmentation fault -> range non valido
+  3. Se "cioccolato" c'è ma viene dopo "menta" -> range non valido 
+
+Errori:
+-*i=cacao;
+Si va in undefined behaveiour perché il vettore potrebbe essere vuoto
+Correzione: 
+if(i!=v.end())
+   *i=cacao;
+Così facendo ci proteggiamo dall'UB
+- for( ; i!=i_end; i++) std::cout << *i << std::endl;
+Stampiamo tutti gli elementi tranne l'ultimo (succede perché abbiamo 
+aggiunto "vaniglia") e soprattutto i e i_end NON sono più iteratori validi
+a causa dell'inserimento e potrebbero non puntare all'interno del vector.
+Correzione:
+i=v.insert(i, "vaniglia"); 
+for( ; i!=v.end(); i++)
+Riassegnamo i e usiamo v.end() al posto di i_end che è stato invalidato 
+
+6.
+Se c'è un problema con 
+p_three = new Three();
+si ha memory leak di p_two.
+
+Per risolverlo 
+try {
+p_three = new Three();
+} catch(...){
+delete p_two;
+}
+
+Dichiarati privati e non implementati.
+  OneTwoThree(const OneTwoThree&);
+  OneTwoThree& operator=(const OneTwoThree&);

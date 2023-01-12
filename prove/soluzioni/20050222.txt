@@ -1,0 +1,179 @@
+1.
+
+chiamata 1 : cand { 1, 2, 3, 4, 5, 6} util {2} migliore 2 
+chiamata 2 : cand { 1, 2, 3, 4, 5, 6} util { 1, 2 } migliore 1
+chiamata 3 : cand { 1, 2, 3, 4, 5, 6 } util { 2 } migliore 2
+chiamata 4 : cand { 1, 2, 3, 4, 5, 6} util { 3, 4 } migliore 3
+chiamata 5 : cand { 1, 2, 3, 4, 5, 6} util { 4 } migliore 4 
+chiamata 6 : cand { 1, 2, 3, 4, 5, 6 } util { 4, 5, 6 } migliore 5
+chiamata 7 : cand { 1, 2, 3, 4, 5, 6 } util { 4 } migliore 4 
+chiamata 8 : cand { 1, 2, 3, 4, 5, 6 } util { 4, 6 } migliore 6
+chiamata 9 : cand { 7, 8 } util { 7 } migliore 7 
+chiamata 10 : cand { 7, 8 } util { 8 } migliore 8
+chiamata 11 : cand { 7, 8 } util { 7 } migliore 7
+chiamata 12 : cand { 7, 8 } util { 7, 8} AMBIGUA
+
+2.
+Constructor ZooAnimal
+Constructor Endangered
+Constructor Bear
+Constructor Raccoon
+Constructor Panda
+Panda::print
+Bear::print
+Panda::print
+Endangered::print
+
+3.
+Sia Angolo.hh che Costante.hh potrebbero 
+essere incluse molteplici volte, sarebbe bene includere 
+delle guardie contro l'inclusione multipla 
+
+4.
+template <typename T, typename Container>
+double average (Container<T> c){
+auto i = c.begin();
+auto e = c.end();
+
+double somma = 0;
+int n = 0;
+
+for ( ; i!=end; ++i){
+	somma += *i;
+	n++;
+}
+
+double media = somma/n;
+return media;
+}
+
+In questo caso il contenitore deve fornire i metodi begin() e end() che 
+restituiscono un iteratore all'inizio e alla fine della sequenza
+rispettivamente. Il tipo di dato T deve offire l'operatore +
+
+template <typename Iter>
+double average (Iter first, Iter last){
+double somma = 0;
+int n = 0;
+for ( ; first!= last; ++first){
+	somma += *first;
+	n++;
+}
+
+double media = somma/n;
+return media;
+
+}
+
+Iter deve implemntare il concetto di iteratore
+
+
+La seconda versione è più generale della prima perché permette di essere 
+eseguita anche solo su specifiche parti del contenitore e non 
+necessariamente su tutto il contenitore.
+
+5.
+
+input_iterator
+Non riavvolgibili, di sola lettura -> utilizzo per lettura da stream
+
+forward_iterator : public input_iterator
+Riavvolgibili, rw, solo ++ -> forward_list
+
+bidirectional_iterator: public forward_iterator
+come sopra ma anche -- -> list
+
+random_access_iterator: public bidirectional_iterator
+come sopra ma anche spostamenti arbitrari +n -> vector
+
+output_iterator
+Solo scrittura -> scrittura stream di output
+
+6.
+
+template <typename T>
+class Set : public std::list<T> {
+public:
+// Costruisce l’insieme vuoto.
+Set();
+// Costruisce il singoletto che contiene t.
+Set(const T& t);
+Set(const Set& y);
+void operator=(const Set& y);
+virtual ~Set();
+
+unsigned int size() const;
+bool is_empty() const;
+bool contains(const Set& y) const;
+
+T min();
+
+void pop_min();
+void insert(const T& z);
+
+void union_assign(const Set& y);
+void intersection_assign(const Set& y);
+
+void swap(Set y);
+
+std::ostream operator<<(std::ostream os);
+
+private:
+// ...
+};
+
+8.
+
+template <typename T>
+class Container {
+public:
+Container(int size)
+: sz(size){
+try{
+	 ps(new T[sz]);
+}catch(....){
+	delete ps[];
+	throw;
+}
+}
+~Container() {
+delete ps[];
+}
+private:
+T* ps;
+int sz;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

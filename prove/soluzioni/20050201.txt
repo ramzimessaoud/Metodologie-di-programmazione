@@ -1,0 +1,265 @@
+1.
+
+chiamata 1: cand {1, 2} util {1,2} migliore {2}
+chiamata 2: cand {5} util {5} migliore {5}
+chiamata 3: cand {3, 6} util {3, 6} migliore AMBIGUA
+chiamata 4: cand {4, 7} util {4} migliore {4}
+chiamata 5: cand {8} util {} migliore ERRORE
+chiamata 6: cand {} util {} migliore ERRORE
+chiamata 7: cand {3} util {3} migliore {3}
+chiamata 8: cand {3, 6} util {3, 6} migliore AMBIGUA
+
+2.
+Constructor Base::Base()
+Constructor Base::Base()
+Constructor Derived::Derived()
+=== 1 ===
+Base::f(int)
+Base::f(int)
+Base::g(int)
+=== 2 ===
+Derived::f(char)
+Derived::f(char)
+Derived::g(int)
+=== 3 ===
+Base::f(double)
+Base::f(int)
+Derived::g(int)
+Destructor Derived::~Derived()
+Destructor Base::~Base()
+Destructor Base::~Base()
+
+3.
+In ogni unità di traduzione deve essere presente
+una sola definizione per ogni variabile/funzione 
+int a = 4;
+int a = 5;
+
+In ogni programma esattamente una definizione per ogni variabile
+e funzione non-inline 
+
+Una definizione per le funzioni inline in ogni unità di traduzione 
+che la utilizza
+
+- più dichiarazioni di una classe a patto che siano semanticamente e 
+sintatticamente identiche
+a.
+struct a{
+	int a;
+	int b;
+}
+
+struct a{
+	int b;
+	int a;
+}
+
+b.
+typedef T int;
+struct S { T a; T b; };
+
+typedef T double;
+struct S { T a; T b; };
+
+4.
+Viola il principio OCP in quanto per effettuare delle estensioni
+è necessario modificare tutto il codice che non è, quindi, chiuso alle 
+modifiche. Inoltre questo codice non è object oriented.
+
+class Scheda{
+
+virtual void addebita_chiamata(const Chiamata& call) = 0;
+
+}
+
+class PagaPiu : public Scheda{
+public:
+void addebita_chiamata(const Chiamata& call) override{
+ fai_la_cosa_giusta_1(const Chiamata& call)
+}
+private: 
+void fai_la_cosa_giusta_1(const Chiamata& call) {
+}; 
+
+}
+ 
+class ConstoRandom : public Scheda{
+public:
+void addebita_chiamata(const Chiamata& call) override{
+	fai_la_cosa_giusta_2(const Chiamata& call)
+}
+private: 
+
+void fai_la_cosa_giusta_2(const Chiamata& call) {
+}; 
+
+
+
+}
+
+class PagaLaMamma : public Scheda{
+public:
+void addebita_chiamata(const Chiamata& call) override{
+	fai_la_cosa_giusta_3(const Chiamata& call);
+}
+private: 
+
+void fai_la_cosa_giusta_3(const Chiamata& call) {
+}; 
+
+
+}
+
+
+5.
+void f(const std::vector<std::string>& vs, const char c){
+vs.sort();
+auto i = vs.begin();
+auto f = vs.end();
+for ( ; i!=f; ++i){
+	auto s = (*i).begin();
+	if(*s == c)
+		std::cout << *s;
+
+}
+}
+
+//Al contrario
+void f(
+const std::vector<std::string>& vs, const char c){
+vs.sort();
+auto i = vs.rbegin();
+auto f = vs.rend();
+for ( ; i!=f; ++i){
+	auto s = (*i).begin();
+	if(*s == c)
+		std::cout << *s;
+
+}
+}
+
+6.
+template <typename Iter, typename T> 
+void replace(Iter first, Iter last, const T& old_value, const T& new_value){
+for ( ; first!=last; ++first){
+	if(*first==old_value)
+		*first = new_value;
+}
+
+}
+
+Iter deve fornire il concetto di iteratore, deve perciò permettere di 
+scorrere una sequenza, dereferenziarsi, confrontarsi ed essere
+copiabile.
+Il tipo di dato T deve permettere il confronto.
+
+7.
+
+
+
+Container<int> ci1; OK
+Container<int> ci2 = ci1; 
+Container<double> cd2 = dynamic_cast<Container<double>>(ci1); 
+Container<int> ci3; 
+Container<double> cd3; 
+ci3 = ci1; 
+cd3 = dynamic_cast<Container<double>>(ci1);
+
+Soluzione
+template <typename T>
+class Container {
+ public:
+  Container();
+  template <typename U>
+  Container(const Container<U>& y);
+  template <typename U>
+  Container% operator=(const Container<U>& y);
+  ~Container();
+private:
+// ...
+};
+
+
+8.
+void f() { 
+	lock("lock1"); 
+		try { 
+		lock("lock2"); 
+			try { 
+				do_the_job(); 
+				unlock("lock2"); 
+				unlock("lock1"); 
+			} catch (...) { 
+			unlock("lock2"); 
+			***** throw *****
+			} 
+		} catch (...) { 
+		unlock("lock1"); 
+		***** throw *****
+		} 
+}
+
+Il problema si ha perché il codice non è neutrale verso le eccezioni,
+dovrebbe rilanciarle per liberare tutte le risorse in caso di eccezione
+
+struct Risorsa;
+class GestoreRisorsa{
+ private:
+  Risorsa* ris;
+ public:
+  GestoreRisorsa();
+  GestoreRisorsa(const GestoreRisorsa&)=delete;
+  ~GestoreRisorsa();
+  GestoreRisorsa& operator=(const GestoreRisorsa&)=delete;
+  GestoreRisorsa& operator=(GestoreRisorsa&&);
+  GestoreRisorsa(GestoreRisorsa&&);
+}
+
+
+void f() {
+ GestoreRisorsa gr1;
+ gr1.ris=Risorsa1;
+ GestoreRisorsa gr2;
+ gr2.ris=Risorsa2;
+ do_the_job();
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,212 @@
+1.
+\\da rivedere
+chiamata A cand {1, 2, 3, 4, 5, 6} util {4, 6} migliore 6
+chiamata B cand {1, 2, 3, 4, 5, 6} util {4, 5, 6} migliore 5
+chiamata C cand {1, 2, 3, 4, 5, 6} util {4, 5, 6} migliore 6
+chiamata D cand {1, 2, 3, 4, 5, 6} util {4} migliore 4
+chiamata E cand {1, 2, 3, 4, 5, 6} util {2} migliore 2
+chiamata F cand {1, 2, 3, 4, 5, 6} util {1} migliore 1
+chiamata G cand {1, 2, 3, 4, 5, 6} util {2} migliore 2
+chiamata H cand {1, 2, 3, 4, 5, 6} util {1, 2} migliore 1
+chiamata I cand {9} util {9} migliore 9
+chiamata L cand {7, 8, 9} util {7, 8} migliore 8
+chiamata M cand {7, 8, 9} util {7, 8} migliore 7
+chiamata N cand {7, 8} util {7, 8} migliore 8
+
+2.
+
+"Costruttore Base"
+"Costruttore Derived"
+
+
+"Costruttore Base"
+
+"=== 1 ==="
+
+Derived::foo(int)"
+"Base::foo(int)"
+"Base::bar(double)"
+"Derived::bar(double) const"
+"Derived::bar(int)const"
+
+"=== 2 ==="
+"Base::bar(int)"
+"Derived::bar(double) const"
+"Derived::foo(int)"
+"Base::bar(int)"
+
+"=== 3 ==="
+"Base::foo(int)"
+"Base::bar(double)"
+
+"Distruttore Base"
+
+"Distruttore Derived"
+"Distruttore Base"
+
+"Distruttore Base"
+
+"
+
+3.
+
+//Fax.hh
+class Fax{
+public:
+virtual void fax_function_1()=0;
+virtual void fax_function_2(const char*)=0;
+virtual void fax_function_3(int)=0;
+virtual ~Fax(){};
+}
+
+//Modem.hh
+class Modem{
+public:
+virtual void modem_function_1(const char*)=0;
+virtual void modem_function_2()=0;
+virtual void modem_function_3(unsigned int)=0;
+virtual ~Modem(){};
+}
+
+
+// File User.cc
+#include "FaxModem.hh"
+void user_function_1(Fax& f) {
+f.fax_function_1();
+// ...
+f.fax_function_3(12);
+// ...
+}
+void user_function_2(Modem& m, const char* command) {
+m.modem_function_1(command);
+// ...
+m.modem_function_3(1024);
+// ...
+}
+void user_function_3(Fax& f, Modem& m) {
+f.fax_function_2("+390521906950");
+// ...
+m.modem_function_2();
+// ...
+}
+
+//File AllStarsAdapter.hh
+#include FaxModem.hh
+
+class AllStarsAdapter: public Fax, public Modem {
+	private:
+	 FaxModem_AllStars fm;
+	
+	public:
+virtual void modem_function_1(const char*){fm.modem_function_1(const char*)};
+virtual void modem_function_2(){fm.modem_function_2()};
+virtual void modem_function_3(unsigned int){fm.modem_function_1(unsigned int)};
+virtual void fax_function_1(){fm.fax_function_1()};
+virtual void fax_function_2(const char*)fax_function_2(const char*)};
+virtual void fax_function_3(int){fm.fax_function_1(int)};
+
+}
+
+
+4. Verrebbe violata la One Definition Rule
+Esempio Polinomio e Razionale 
+
+5.
+template <typename Iter, typename UnaryPred>
+Iter remove_copy_if (Iter i1, Iter fl,
+		     Iter i2,
+		     UnaryPred ub){
+for( ; i1 != f1; ++i1){
+  if(!ub(*i1)){
+	*i2=*i1;
+	++i2;	
+  }
+} 
+return i2;
+}
+
+template <typename FwdIter, typename UnaryPred>
+FwdIter
+remove_if (FwdIter first, FwdIter last, UnaryPred pred){
+  first = find_if (first, last, pred);
+  if (first == last)
+	return first;
+  FwdItr res = first;
+  ++first;			//Questo impone FwdIter
+  for( ; first != last; ++first) 
+	if(!pred(first)){	//NON deve essere rimosso
+  	  *res = *first;	//Li copio nella posizione che avranno 
+	  ++res;
+  	}
+  return res;			//Punta al primo elemento dei rimossi
+}
+
+
+6.
+
+Il costruttore di copia di Derived non era implementato nè eliminato
+di default copierà i puntatori->due puntatori che puntano a stessa risorsa
+doppia eliminazione
+
+
+#include <iostream>
+class Base {
+ private:
+  int* pi;
+  // Assegnamento: privato e non implementato.
+  Base& operator=(const Base&);
+ public:
+  Base() : pi(new int) {}
+  Base(const Base& b) : pi(new int) { *pi = *(b.pi); }
+  Base(int i){ pi=new int(i);}
+  
+  ~Base() { delete pi; }
+  int foo() { return *pi; } 
+  Base(Base&&)=delete;
+};
+
+class Derived : public Base {
+ private:
+  int* pj;
+  // Assegnamento: privato e non implementato.
+  Derived& operator=(const Derived&);
+  Derived (const Derived&);
+ public:
+  Derived() : pj(new int) {}
+  Derived(int i){ pj=new int(i);}
+  ~Derived() { delete pj; }
+  int foo() { return *pj; + Base::foo(); }
+};
+
+int main (){
+Derived d (1);
+Base* c=&d;
+Derived f(d);
+//int i=d.foo();
+std::cout<<i<<std::endl;
+
+return 0;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
