@@ -6,4 +6,4 @@ IMPORTANTE: Seguite le videolezioni del 2019, sono le più complete è le più c
 Link elly 2019 https://elly.smfi.unipr.it/2019/enrol/index.php?id=116
 
 
-N.B. Il repository non è completo e non sara aggioranto, non è abbastanza per passsare l'esame, usatelo per prendere spunto mentre studiate.
+N.B. Il repository non è completo e non sara aggioranto.
